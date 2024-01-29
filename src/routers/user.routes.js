@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, json } from "express";
 import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verfyJwt } from "../middlewares/auth.middleware.js";
@@ -21,4 +21,9 @@ router.route("/registerUser").post(
 router.route("/login").post(loginUser)
 // secure routes
 router.route("/logout").post(verfyJwt,logoutUser)
+
+// test rout
+router.route("/test").get((req, res) => {
+    res.send('hello world')
+  })
 export default router
