@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js"
 import { uploadOnCloudinary } from "../utils/Cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose"
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId)
@@ -21,7 +22,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
     )
   }
 }
-// USER REGISTATION
+// USER REGISTATION ✅
 const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
   // validation - not empty
@@ -96,7 +97,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User registered Successfully"))
 })
 
-// USER LOGIN
+// USER LOGIN ✅
 const loginUser = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body
   if (!username && !email) {
@@ -143,7 +144,7 @@ const loginUser = asyncHandler(async (req, res) => {
     )
 })
 
-// LOGOUT USER
+// LOGOUT USER ✅
 const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
@@ -167,7 +168,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "user logged Out"))
 })
 
-// REFRESH ACCESS TOKEN RE-GENERATE CONTROLER
+// REFRESH ACCESS TOKEN RE-GENERATE CONTROLER ✅
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
   if (!incomingRefreshToken) {
@@ -209,11 +210,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 })
 
-// password change
+// password change ✅
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body
-  const user = User.findById(req.user?._id)
-  const isPasswordCorrect = user.isPasswordCorrect(oldPassword)
+  const user =await User.findById(req.user?._id)
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
   if (!isPasswordCorrect) {
     throw new ApiError(400, "invalid password")
   }
@@ -225,14 +226,14 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "password changed successfully"))
 })
 
-// geting current user
+// geting current user ✅
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(200, req.user, "current user fetched successfully")
+    .json(new ApiResponse(200, req.user, "current user fetched successfully"))
 })
 
-// update user account text details
+// update user account text details ✅
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, email } = req.body
   const user = await User.findByIdAndUpdate(
@@ -246,10 +247,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     { new: true }
   ).select("-password")
 
-  return res.status(200).json(200, user, "Account details update successfully")
+  return res.status(200).json(new ApiResponse(200, user, "Account details update successfully"))
 })
 
-// upadate user avatar
+// upadate user avatar ✅
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path
   if (!avatarLocalPath) {
@@ -271,10 +272,10 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   ).select("-password")
   return res
     .status(200)
-    .json(new ApiResponse(200, uesr, "Avatar image is updated succesfully"))
+    .json(new ApiResponse(200, user, "Avatar image is updated succesfully"))
 })
 
-// upadate user coverImage
+// upadate user coverImage ✅
 const updateUsercoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path
   if (!coverImageLocalPath) {
@@ -296,13 +297,12 @@ const updateUsercoverImage = asyncHandler(async (req, res) => {
   ).select("-password")
   return res
     .status(200)
-    .json(new ApiResponse(200, uesr, "Cover image is updated succesfully"))
+    .json(new ApiResponse(200, user, "Cover image is updated succesfully"))
 })
 
-// get user channel profile details
+// get user channel profile details ✅
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params
-
   if (!username?.trim()) {
     throw new ApiError(400, "username is missing")
   }
@@ -372,7 +372,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     )
 })
 
-//get user watch history
+//get user watch history ✅
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
